@@ -1,0 +1,44 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TERRA SAFE AI</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial;background:#f4f7fb;color:#172033}.hidden{display:none!important}
+.login{min-height:100vh;display:grid;place-items:center;background:linear-gradient(135deg,#083b70,#0b76c9)}
+.box{background:#fff;width:390px;padding:35px;border-radius:20px;box-shadow:0 20px 60px #0003}.logo{font-size:25px;font-weight:800;color:#0b559d}
+input{width:100%;padding:12px;border:1px solid #d6dee9;border-radius:9px;margin:7px 0 15px}button{cursor:pointer}
+.primary{background:#0967b7;color:white;border:0;padding:12px;border-radius:9px;font-weight:700;width:100%}
+.app{display:none}.side{position:fixed;inset:0 auto 0 0;width:235px;background:#082b52;color:#fff;padding:25px 14px}.brand{font-weight:800;font-size:20px;margin:5px 10px 25px}
+.nav button{display:block;width:100%;background:transparent;color:#dbeafe;border:0;text-align:left;padding:13px;border-radius:8px}.nav button:hover,.nav .on{background:#0b63ad;color:white}
+.main{margin-left:235px;padding:25px}.top{display:flex;justify-content:space-between;align-items:center}.logout{padding:9px 14px;background:white;border:1px solid #ccd5e1;border-radius:8px}
+.page{display:none}.page.on{display:block}.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:15px}.card,.panel{background:#fff;border:1px solid #e3e8ef;border-radius:14px;padding:18px}.big{font-size:29px;font-weight:800;margin-top:8px}.danger{color:#d52b22}.warn{color:#ad7200}.safe{color:#158346}
+.grid{display:grid;grid-template-columns:1.5fr 1fr;gap:18px;margin-top:18px}#map,#map2{height:450px;border-radius:10px}.zone{display:flex;justify-content:space-between;padding:13px 0;border-bottom:1px solid #eee}.badge{padding:5px 9px;border-radius:20px;font-size:11px;font-weight:800}.high{background:#ffe3e0;color:#b52219}.moderate{background:#fff0cc;color:#875d00}.low{background:#ddf6e7;color:#126b38}
+.form{display:grid;grid-template-columns:1fr 1fr;gap:12px}.result{margin-top:18px;padding:18px;background:#f5f8fc;border-radius:12px}.risk{font-size:40px;font-weight:900}
+table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:13px;border-bottom:1px solid #eee}
+@media(max-width:850px){.side{width:70px}.brand{font-size:0}.brand:after{content:'TS';font-size:20px}.main{margin-left:70px}.cards{grid-template-columns:1fr 1fr}.grid{grid-template-columns:1fr}}
+</style></head>
+<body>
+<div id="login" class="login"><div class="box"><div class="logo">🌍 TERRA SAFE AI</div><h2>Disaster Risk Intelligence</h2><p>AI + GIS Landslide Monitoring</p>
+<label>Username</label><input id="u" value="admin"><label>Password</label><input id="p" type="password" value="terra123">
+<button class="primary" onclick="login()">Login to Dashboard</button><p id="msg" class="danger"></p><small>Demo: admin / terra123</small></div></div>
+<div id="app" class="app"><aside class="side"><div class="brand">🌍 TERRA SAFE AI</div><div class="nav">
+<button class="on" onclick="page('dash',this)">🏠 Dashboard</button><button onclick="page('pred',this)">🤖 Risk Prediction</button><button onclick="page('gis',this)">🗺️ GIS Risk Map</button><button onclick="page('roads',this)">🛣️ Road Risk</button><button onclick="page('model',this)">📊 Model Performance</button></div></aside>
+<main class="main"><div class="top"><div><h1 id="title">Dashboard</h1><span>AI-powered landslide monitoring prototype</span></div><button class="logout" onclick="location.reload()">Logout</button></div>
+<section id="dash" class="page on"><div class="cards"><div class="card"><small>Overall Risk</small><div class="big danger">HIGH</div></div><div class="card"><small>High-Risk Zones</small><div class="big">2</div></div><div class="card"><small>Prediction Confidence</small><div class="big">87%</div></div><div class="card"><small>Roads Monitored</small><div class="big">12</div></div></div><div class="grid"><div class="panel"><h3>Risk Overview</h3><div id="map"></div></div><div class="panel"><h3>Priority Zones</h3><div id="zones"></div></div></div></section>
+<section id="pred" class="page"><div class="panel"><h2>AI Landslide Risk Prediction</h2><div class="form" id="form"></div><button class="primary" onclick="predict()">Run AI Prediction</button><div id="res" class="result hidden"></div></div></section>
+<section id="gis" class="page"><div class="panel"><h2>GIS Risk Map</h2><p>Demo zones. Replace with validated GIS layers for deployment.</p><div id="map2"></div></div></section>
+<section id="roads" class="page"><div class="panel"><h2>Road Risk & Route Guidance</h2><table><thead><tr><th>Road</th><th>Risk</th><th>Status</th></tr></thead><tbody id="roads"></tbody></table></div></section>
+<section id="model" class="page"><div class="panel"><h2>Model Performance</h2><div class="cards" id="metrics"></div></div></section>
+</main></div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+const fs=[["rainfall","Rainfall (mm)",180],["soil_moisture","Soil Moisture (0-1)",.42],["temperature","Temperature (C)",24],["humidity","Humidity (%)",82],["slope","Slope (deg)",38],["elevation","Elevation (m)",1450],["land_cover","Land Cover (1-5)",3],["distance_to_road","Distance to Road (m)",250],["historical_landslides","Historical Landslides",2],["terrain_roughness","Terrain Roughness (0-1)",.7]];
+document.getElementById("form").innerHTML=fs.map(x=>`<div><label>${x[1]}</label><input id="${x[0]}" type="number" step="0.01" value="${x[2]}"></div>`).join("");
+let data,map,map2;
+function login(){if(u.value==="admin"&&p.value==="terra123"){loginDiv();load()}else msg.textContent="Invalid demo credentials."}
+function loginDiv(){document.getElementById("login").classList.add("hidden");document.getElementById("app").style.display="block"}
+function page(id,b){document.querySelectorAll(".page").forEach(x=>x.classList.remove("on"));document.getElementById(id).classList.add("on");document.querySelectorAll(".nav button").forEach(x=>x.classList.remove("on"));b.classList.add("on");title.textContent=b.textContent.replace(/^.. /,"");setTimeout(()=>{map?.invalidateSize();map2?.invalidateSize()},100);if(id==="gis"&&!map2)initMap("map2")}
+async function load(){data=await fetch("/api/zones").then(r=>r.json());zones.innerHTML=data.zones.map(z=>`<div class="zone"><span><b>${z.name}</b><br><small>${z.score}% risk score</small></span><span class="badge ${z.risk.toLowerCase()}">${z.risk}</span></div>`).join("");roads.innerHTML=data.roads.map(r=>`<tr><td>${r.name}</td><td><span class="badge ${r.risk.toLowerCase()}">${r.risk}</span></td><td>${r.status}</td></tr>`).join("");let m=await fetch("/metrics").then(r=>r.json());metrics.innerHTML=[["Accuracy",m.accuracy*100+"%"],["Precision",m.precision*100+"%"],["Recall",m.recall*100+"%"],["ROC-AUC",m.roc_auc]].map(x=>`<div class="card"><small>${x[0]}</small><div class="big">${Number(x[1]).toFixed(2)}%</div></div>`).join("");initMap("map")}
+function initMap(id){let m=L.map(id).setView([11,76.96],12);L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{attribution:"© OpenStreetMap"}).addTo(m);data.zones.forEach(z=>{let c=z.risk==="HIGH"?"#d52b22":z.risk==="MODERATE"?"#c78300":"#168447";L.circleMarker([z.lat,z.lng],{radius:10,color:c,fillColor:c,fillOpacity:.75}).addTo(m).bindPopup(`<b>${z.name}</b><br>Risk: ${z.risk}<br>Score: ${z.score}%`)});if(id==="map")map=m;else map2=m}
+async function predict(){let body={};fs.forEach(x=>body[x[0]]=Number(document.getElementById(x[0]).value));let d=await fetch("/predict",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)}).then(r=>r.json());res.classList.remove("hidden");res.innerHTML=`<div>AI PREDICTION</div><div class="risk ${d.risk.toLowerCase()}">${d.risk}</div><b>Probability: ${(d.probability*100).toFixed(1)}%</b> &nbsp; | &nbsp; <b>Risk Score: ${d.risk_score}/100</b><p>${d.message}</p>`}
+</script></body></html>

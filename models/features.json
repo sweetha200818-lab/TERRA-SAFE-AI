@@ -1,0 +1,12 @@
+[
+  "rainfall",
+  "soil_moisture",
+  "temperature",
+  "humidity",
+  "slope",
+  "elevation",
+  "land_cover",
+  "distance_to_road",
+  "historical_landslides",
+  "terrain_roughness"
+]
