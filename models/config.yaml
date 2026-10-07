@@ -1,0 +1,138 @@
+api:
+  description: API for predicting landslide risk using ML + GIS
+  host: 0.0.0.0
+  port: 8000
+  rate_limit:
+    enabled: true
+    requests_per_minute: 60
+  reload: true
+  title: TERRA SAFE AI - Landslide Risk Prediction API
+  version: 1.0.0
+  workers: 4
+evaluation:
+  metrics:
+  - accuracy
+  - precision
+  - recall
+  - f1_score
+  - roc_auc
+  - confusion_matrix
+  - classification_report
+  plots:
+  - roc_curve
+  - precision_recall_curve
+  - confusion_matrix
+  - feature_importance
+  - calibration_curve
+  - risk_distribution
+  threshold_optimization:
+    enabled: true
+    method: youden
+features:
+  categorical:
+  - land_cover
+  feature_groups:
+    climatic:
+    - rainfall_mm
+    - temperature_c
+    - humidity_percent
+    hydrologic:
+    - soil_moisture
+    - distance_to_road_km
+    land_use:
+    - land_cover
+    topographic:
+    - slope_degrees
+    - elevation_m
+  numerical:
+  - rainfall_mm
+  - soil_moisture
+  - temperature_c
+  - humidity_percent
+  - slope_degrees
+  - elevation_m
+  - distance_to_road_km
+  target:
+  - historical_landslide
+gis:
+  admin_levels:
+  - district
+  - state
+  - country
+  compression: lzw
+  crs: EPSG:4326
+  interpolation_method: linear
+  output_format: GeoTIFF
+  raster_resolution: 30
+  risk_map_bands: 1
+  road_buffer_distances:
+  - 0.5
+  - 1.0
+  - 2.0
+  - 5.0
+  target_crs: EPSG:3857
+logging:
+  backup_count: 5
+  file: outputs/logs/terra_safe_ai.log
+  format: '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+  level: INFO
+  max_bytes: 10485760
+models:
+  ensemble:
+    voting: soft
+    weights:
+    - 0.5
+    - 0.5
+  random_forest:
+    class_weight: balanced
+    max_depth: 15
+    max_features: sqrt
+    min_samples_leaf: 2
+    min_samples_split: 5
+    n_estimators: 200
+    n_jobs: -1
+    random_state: 42
+  xgboost:
+    colsample_bytree: 0.8
+    eval_metric: logloss
+    learning_rate: 0.1
+    max_depth: 8
+    n_estimators: 200
+    n_jobs: -1
+    random_state: 42
+    scale_pos_weight: 1
+    subsample: 0.8
+paths:
+  district_risk: outputs/district_risk
+  heatmaps: outputs/heatmaps
+  high_risk_zones: outputs/high_risk_zones
+  logs: outputs/logs
+  models: models
+  outputs: outputs
+  processed_data: data/processed
+  raw_data: data/raw
+  risk_maps: outputs/risk_maps
+  road_risk: outputs/road_risk
+  routes: outputs/routes
+project:
+  description: AI/ML + GIS Risk Engine for Landslide Prediction
+  name: TERRA SAFE AI
+  version: 1.0.0
+risk_thresholds:
+  calibration_method: percentile
+  high_min: 0.61
+  low_max: 0.3
+  moderate_max: 0.6
+training:
+  cross_validation:
+    enabled: true
+    n_splits: 5
+    scoring: roc_auc
+  hyperparameter_tuning:
+    enabled: false
+    method: optuna
+    n_trials: 50
+  random_state: 42
+  stratify: true
+  test_size: 0.2
+  validation_size: 0.1

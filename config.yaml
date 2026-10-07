@@ -1,0 +1,200 @@
+# TERRA SAFE AI - Configuration
+project:
+  name: "TERRA SAFE AI"
+  version: "1.0.0"
+  description: "AI/ML + GIS Risk Engine for Landslide Prediction"
+
+# Data paths
+paths:
+  raw_data: "data/raw"
+  processed_data: "data/processed"
+  models: "models"
+  outputs: "outputs"
+  risk_maps: "outputs/risk_maps"
+  heatmaps: "outputs/heatmaps"
+  high_risk_zones: "outputs/high_risk_zones"
+  district_risk: "outputs/district_risk"
+  road_risk: "outputs/road_risk"
+  routes: "outputs/routes"
+  logs: "outputs/logs"
+
+# Real-time data sources (all training/inference data is fetched live -
+# no synthetic or sample records are generated anywhere in the project)
+realtime:
+  cache_dir: "data/cache"
+  request_timeout: 15
+  max_workers: 6             # parallel live requests
+  user_agent: "TERRA-SAFE-AI/1.0 (real-time landslide risk research)"
+  weather_chunk_size: 10       # few, large calls: Open-Meteo enforces an hourly quota
+
+  # Total labelled records to build (split evenly landslide / control)
+  n_samples: 40
+
+  # Control points must be at least this far from any recorded landslide
+  min_control_distance_km: 5.0
+  random_state: 42
+
+  # Study region and observation window
+  region:
+    name: "Uttarakhand, India"
+    bbox: [78.0, 30.0, 79.0, 31.0]   # min_lon, min_lat, max_lon, max_lat
+  date_range:
+    start: "2010-01-01"
+    end: "2018-12-31"
+
+  sources:
+    # NASA Global Landslide Catalog on NASA Open Data Portal (CKAN)
+    landslide_catalog: "https://data.nasa.gov/api/3/action/datastore_search"
+    landslide_resource_id: "4685f984-4132-4446-8434-2353c10ae923"
+    # Observed / reanalysis weather
+    weather_archive: "https://archive-api.open-meteo.com/v1/archive"
+    # Live nowcast weather
+    weather_forecast: "https://api.open-meteo.com/v1/forecast"
+    # Real terrain (Copernicus DEM)
+    elevation: "https://api.open-meteo.com/v1/elevation"
+    # Land cover, roads and administrative boundaries
+    overpass:
+      - "https://overpass-api.de/api/interpreter"
+      - "https://maps.mail.ru/osm/tools/overpass/api/interpreter"
+      - "https://overpass.private.coffee/api/interpreter"
+
+# Input features configuration
+features:
+  numerical:
+    - "rainfall_mm"
+    - "soil_moisture"
+    - "temperature_c"
+    - "humidity_percent"
+    - "slope_degrees"
+    - "elevation_m"
+    - "distance_to_road_km"
+  categorical:
+    - "land_cover"
+  target:
+    - "historical_landslide"
+  feature_groups:
+    climatic:
+      - "rainfall_mm"
+      - "temperature_c"
+      - "humidity_percent"
+    topographic:
+      - "slope_degrees"
+      - "elevation_m"
+    hydrologic:
+      - "soil_moisture"
+      - "distance_to_road_km"
+    land_use:
+      - "land_cover"
+
+# Risk classification thresholds (calibrated from training data)
+risk_thresholds:
+  low_max: 0.30
+  moderate_max: 0.60
+  high_min: 0.61
+  # These should be calibrated from validation data
+  calibration_method: "percentile"  # or "fixed", "youden", "optimal"
+
+# Model configuration
+models:
+  random_forest:
+    n_estimators: 200
+    max_depth: 15
+    min_samples_split: 5
+    min_samples_leaf: 2
+    max_features: "sqrt"
+    random_state: 42
+    n_jobs: -1
+    class_weight: "balanced"
+  
+  xgboost:
+    n_estimators: 200
+    max_depth: 8
+    learning_rate: 0.1
+    subsample: 0.8
+    colsample_bytree: 0.8
+    random_state: 42
+    n_jobs: -1
+    scale_pos_weight: 1
+    eval_metric: "logloss"
+  
+  ensemble:
+    voting: "soft"
+    weights: [0.5, 0.5]  # RF, XGB
+
+# Training configuration
+training:
+  test_size: 0.2
+  validation_size: 0.1
+  random_state: 42
+  stratify: true
+  cross_validation:
+    enabled: true
+    n_splits: 5
+    scoring: "roc_auc"
+  hyperparameter_tuning:
+    enabled: false
+    method: "optuna"  # or "grid", "random"
+    n_trials: 50
+
+# GIS configuration
+gis:
+  crs: "EPSG:4326"  # WGS84
+  target_crs: "EPSG:3857"  # Web Mercator for web maps
+  raster_resolution: 30  # meters
+  interpolation_method: "linear"
+  risk_map_bands: 1
+  output_format: "GeoTIFF"
+  compression: "lzw"
+  
+  # Administrative boundaries
+  admin_levels:
+    - "district"
+    - "state"
+    - "country"
+  
+  # Road network
+  road_buffer_distances: [0.5, 1.0, 2.0, 5.0]  # km
+
+# Model evaluation metrics
+evaluation:
+  metrics:
+    - "accuracy"
+    - "precision"
+    - "recall"
+    - "f1_score"
+    - "roc_auc"
+    - "confusion_matrix"
+    - "classification_report"
+  plots:
+    - "roc_curve"
+    - "precision_recall_curve"
+    - "confusion_matrix"
+    - "feature_importance"
+    - "calibration_curve"
+    - "risk_distribution"
+  threshold_optimization:
+    enabled: true
+    method: "youden"  # or "f1", "precision", "recall"
+
+# API configuration
+api:
+  host: "0.0.0.0"
+  port: 8000
+  workers: 4
+  reload: true
+  title: "TERRA SAFE AI - Landslide Risk Prediction API"
+  description: "API for predicting landslide risk using ML + GIS"
+  version: "1.0.0"
+  
+  # Rate limiting
+  rate_limit:
+    enabled: true
+    requests_per_minute: 60
+
+# Logging
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  file: "outputs/logs/terra_safe_ai.log"
+  max_bytes: 10485760  # 10MB
+  backup_count: 5

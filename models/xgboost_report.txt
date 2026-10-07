@@ -1,0 +1,41 @@
+
+============================================================
+MODEL EVALUATION REPORT: XGBOOST
+============================================================
+
+PERFORMANCE METRICS:
+  Accuracy:        0.7325
+  Precision:       0.5506
+  Recall:          0.3069
+  F1-Score:        0.3941
+  ROC-AUC:         0.6970
+  PR-AUC:          0.5040
+  Brier Score:     0.1921
+  Specificity:     0.9009
+  NPV:             0.7666
+
+CONFUSION MATRIX:
+  True Negatives:  1291
+  False Positives: 142
+  False Negatives: 393
+  True Positives:  174
+
+THRESHOLD ANALYSIS:
+  Optimal Threshold (Youden's J): 0.2514
+  Optimal Youden's J:             0.3006
+
+RISK CLASSIFICATION DISTRIBUTION:
+  LOW Risk:       1394 samples
+    Positive Rate: 0.1994
+  MODERATE Risk:  363 samples
+    Positive Rate: 0.4022
+  HIGH Risk:      243 samples
+    Positive Rate: 0.5885
+
+CLASSIFICATION REPORT:
+  Class 0: Precision=0.7666, Recall=0.9009, F1=0.8284, Support=1433.0
+  Class 1: Precision=0.5506, Recall=0.3069, F1=0.3941, Support=567.0
+  Class macro avg: Precision=0.6586, Recall=0.6039, F1=0.6112, Support=2000.0
+  Class weighted avg: Precision=0.7054, Recall=0.7325, F1=0.7053, Support=2000.0
+
+============================================================

@@ -1,0 +1,41 @@
+
+============================================================
+MODEL EVALUATION REPORT: ENSEMBLE
+============================================================
+
+PERFORMANCE METRICS:
+  Accuracy:        0.7330
+  Precision:       0.5411
+  Recall:          0.3827
+  F1-Score:        0.4483
+  ROC-AUC:         0.7127
+  PR-AUC:          0.5290
+  Brier Score:     0.1818
+  Specificity:     0.8716
+  NPV:             0.7811
+
+CONFUSION MATRIX:
+  True Negatives:  1249
+  False Positives: 184
+  False Negatives: 350
+  True Positives:  217
+
+THRESHOLD ANALYSIS:
+  Optimal Threshold (Youden's J): 0.3518
+  Optimal Youden's J:             0.3118
+
+RISK CLASSIFICATION DISTRIBUTION:
+  LOW Risk:       1095 samples
+    Positive Rate: 0.1763
+  MODERATE Risk:  642 samples
+    Positive Rate: 0.3302
+  HIGH Risk:      263 samples
+    Positive Rate: 0.6160
+
+CLASSIFICATION REPORT:
+  Class 0: Precision=0.7811, Recall=0.8716, F1=0.8239, Support=1433.0
+  Class 1: Precision=0.5411, Recall=0.3827, F1=0.4483, Support=567.0
+  Class macro avg: Precision=0.6611, Recall=0.6272, F1=0.6361, Support=2000.0
+  Class weighted avg: Precision=0.7131, Recall=0.7330, F1=0.7174, Support=2000.0
+
+============================================================

@@ -1,0 +1,41 @@
+
+============================================================
+MODEL EVALUATION REPORT: RANDOM_FOREST
+============================================================
+
+PERFORMANCE METRICS:
+  Accuracy:        0.7035
+  Precision:       0.4790
+  Recall:          0.5220
+  F1-Score:        0.4996
+  ROC-AUC:         0.7158
+  PR-AUC:          0.5258
+  Brier Score:     0.1933
+  Specificity:     0.7753
+  NPV:             0.8039
+
+CONFUSION MATRIX:
+  True Negatives:  1111
+  False Positives: 322
+  False Negatives: 271
+  True Positives:  296
+
+THRESHOLD ANALYSIS:
+  Optimal Threshold (Youden's J): 0.4623
+  Optimal Youden's J:             0.3144
+
+RISK CLASSIFICATION DISTRIBUTION:
+  LOW Risk:       719 samples
+    Positive Rate: 0.1280
+  MODERATE Risk:  922 samples
+    Positive Rate: 0.2907
+  HIGH Risk:      359 samples
+    Positive Rate: 0.5766
+
+CLASSIFICATION REPORT:
+  Class 0: Precision=0.8039, Recall=0.7753, F1=0.7893, Support=1433.0
+  Class 1: Precision=0.4790, Recall=0.5220, F1=0.4996, Support=567.0
+  Class macro avg: Precision=0.6414, Recall=0.6487, F1=0.6445, Support=2000.0
+  Class weighted avg: Precision=0.7118, Recall=0.7035, F1=0.7072, Support=2000.0
+
+============================================================
